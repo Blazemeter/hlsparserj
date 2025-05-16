@@ -18,69 +18,39 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.comcast</groupId>
+	<groupId>com.github.blazemeter</groupId>
 	<artifactId>hlsparserj</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>HLS Manifest Parser Java Library</name>
 	<description>HTTP Live Streaming (HLS) Parser for Java</description>
-	<url>https://github.com/Comcast/hlsparserj</url>
+	<url>https://github.com/Blazemeter/hlsparserj</url>
 	<inceptionYear>2015</inceptionYear>
 
-	<organization>
-		<name>Comcast Cable Communications Management, LLC</name>
-		<url>http://www.comcast.com/</url>
-	</organization>
-
 	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
+	    <license>
+	      <name>The Apache License, Version 2.0</name>
+	      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+	    </license>
+	  </licenses>
 
-	<scm>
-		<url>scm:git:git@github.com:Comcast/hlsparserj.git</url>
-		<connection>scm:git:git@github.com:Comcast/hlsparserj.git</connection>
-		<developerConnection>scm:git:git@github.com:Comcast/hlsparserj.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
-
-	<developers>
-		<developer>
-			<name>Kevin Flanagan</name>
-			<email>vipercoder@users.noreply.github.com</email>
-			<organization>Comcast</organization>
-		</developer>
-		<developer>
-			<name>Joseph Kiok</name>
-			<email>vipercoder@users.noreply.github.com</email>
-			<organization>Comcast</organization>
-		</developer>
-	</developers>
+	  <developers>
+	    <developer>
+	      <name>Blazemeter</name>
+	      <email>ops@blazemeter.com</email>
+	      <organization>Blazemeter</organization>
+	      <organizationUrl>https://blazemeter.com/</organizationUrl>
+	    </developer>
+	  </developers>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.source.version>1.7</java.source.version>
+		<java.source.version>1.8</java.source.version>
 		<junit.version>4.11</junit.version>
 		<httpclient.version>4.5.6</httpclient.version>
 		<httpcore.version>4.4.10</httpcore.version>
 	</properties>
-
-	<repositories>
-		<repository>
-			<id>repo1.maven.org</id>
-			<url>https://repo1.maven.org/maven2</url>
-		</repository>
-	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>repo1.maven.org</id>
-			<url>https://repo1.maven.org/maven2</url>
-		</pluginRepository>
-	</pluginRepositories>
 
 	<dependencies>
 		<dependency>
@@ -111,8 +81,13 @@
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-eclipse-plugin</artifactId>
-					<version>2.9</version>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.22.2</version>
+					<configuration>
+						<!-- avoid issue with jdk 11 -->
+						<useSystemClassLoader>false</useSystemClassLoader>
+					</configuration>
+
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -204,30 +179,6 @@
 						</execution>
 					</executions>
 				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-pmd-plugin</artifactId>
-					<version>2.5</version>
-					<configuration>
-						<targetJdk>${java.source.version}</targetJdk>
-						<verbose>true</verbose>
-						<failurePriority>2</failurePriority>
-						<rulesets>
-							<ruleset>http://www.viperx.org/dev-config/pmd/ccp-ruleset.xml</ruleset>
-						</rulesets>
-						<linkXRef>false</linkXRef>
-						<sourceEncoding>UTF-8</sourceEncoding>
-					</configuration>
-					<executions>
-						<execution>
-							<id>PMD</id>
-							<phase>compile</phase>
-							<goals>
-								<goal>check</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
 			</plugins>
 		</pluginManagement>
 
@@ -297,20 +248,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>

@@ -154,7 +154,7 @@ public class UnparsedTag {
                     }
                 } else if (ttype == StreamTokenizer.TT_WORD || ttype == '"') {
                     if (attributeName == null) {
-                        attributeName = tokenizer.sval;
+                        attributeName = tokenizer.sval.trim();
                     } else {
                         attributeValue = tokenizer.sval;
                     }

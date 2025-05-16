@@ -21,6 +21,7 @@ import com.comcast.viper.hlsparserj.tags.master.StreamInf;
 import com.comcast.viper.hlsparserj.tags.media.AllowCache;
 import com.comcast.viper.hlsparserj.tags.media.ByteRange;
 import com.comcast.viper.hlsparserj.tags.media.ExtInf;
+import com.comcast.viper.hlsparserj.tags.media.ExtMap;
 import com.comcast.viper.hlsparserj.tags.media.IFramesOnly;
 import com.comcast.viper.hlsparserj.tags.media.Key;
 import com.comcast.viper.hlsparserj.tags.media.MediaSequence;
@@ -111,6 +112,11 @@ public class TagNames {
     public static final String EXTXBYTERANGE = "EXT-X-BYTERANGE";
     static {
         TagFactory.registerTag(EXTXBYTERANGE, ByteRange.class);
+    }
+
+    public static final String EXTXMAP = "EXT-X-MAP";
+    static {
+        TagFactory.registerTag(EXTXMAP, ExtMap.class);
     }
 
     /**
