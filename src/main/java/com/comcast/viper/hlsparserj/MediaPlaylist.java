@@ -15,6 +15,7 @@
  */
 package com.comcast.viper.hlsparserj;
 
+import com.comcast.viper.hlsparserj.tags.media.ExtMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +68,10 @@ public abstract class MediaPlaylist extends AbstractPlaylist {
     @SuppressWarnings("unchecked")
     public List<ByteRange> getByteRanges() {
         return (List<ByteRange>) getGenericSegments(TagNames.EXTXBYTERANGE);
+    }
+
+    public ExtMap getInitializationSegment() {
+        return (ExtMap) getTag(TagNames.EXTXMAP);
     }
 
     /**
