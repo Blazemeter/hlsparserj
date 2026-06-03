@@ -150,7 +150,17 @@ public abstract class MediaPlaylist extends AbstractPlaylist {
                 if (tagName.equals(TagNames.EXTXDISCONTINUITY)) {
                     discontinuity = true;
                 } else if (tagName.equals(TagNames.EXTXPROGRAMDATETIME)) {
-                    programDateTime = unparsedTag.getAttributes().get("NONAME0");
+                    final String dateTime = unparsedTag.getAttributes().get("NONAME0");
+                    if (!tagList.isEmpty()) {
+                        final Segment lastSegment = (Segment) tagList.get(tagList.size() - 1);
+                        if (lastSegment.getDateTime() == null) {
+                            // PDT after segment tag (e.g. between #EXTINF and URI)
+                            lastSegment.setDateTime(dateTime);
+                            continue;
+                        }
+                    }
+                    // PDT before the next segment tag
+                    programDateTime = dateTime;
                 } else if (tagName.equals(TagNames.EXTXKEY)) {
                     key = new Key();
                     key.setTag(unparsedTag);
