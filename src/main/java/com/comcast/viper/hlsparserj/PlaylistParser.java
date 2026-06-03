@@ -1,5 +1,6 @@
 /**
  * Copyright 2015 Comcast Cable Communications Management, LLC
+ * Copyright 2025 Perforce Software, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +40,13 @@ public class PlaylistParser {
     private static final String URIPATTERN = "^[^#].*";
 
     private boolean isMasterPlaylist = false;
+
+    /**
+     * Tag that should receive the next media segment URI line ({@link TagNames#EXTINF}
+     * or {@link TagNames#EXTXBYTERANGE}). Other tags (e.g. program date/time) may appear
+     * between that tag and the URI without claiming it.
+     */
+    private UnparsedTag lastSegmentUriTag;
 
     /**
      * Constructor.
@@ -81,11 +89,18 @@ public class PlaylistParser {
         return tags;
     }
 
+    private void resetParseState() {
+        tags.clear();
+        isMasterPlaylist = false;
+        lastSegmentUriTag = null;
+    }
+
     /**
      * Parse a given playlist string.
      * @param playlist playlist string
      */
     private void parseString(final String playlist) {
+        resetParseState();
         final StringTokenizer tokenizer = new StringTokenizer(playlist, "\n");
 
         String line;
@@ -101,6 +116,7 @@ public class PlaylistParser {
      * @throws IOException on reading the inputStream
      */
     private void parseInputStream() throws IOException {
+        resetParseState();
         final InputStreamReader isReader = new InputStreamReader(playlistStream);
         final BufferedReader bufReader = new BufferedReader(isReader);
 
@@ -117,16 +133,22 @@ public class PlaylistParser {
      * If the line is prefixed with a "#", it is handled as a new tag and
      * parsed/added to the list of tags.
      *
-     * If the line is a URI, it is set as the URI attribute of the last tag.
+     * If the line is a URI, it is set on the pending segment tag ({@link TagNames#EXTINF}
+     * or {@link TagNames#EXTXBYTERANGE}) when present; otherwise on the last tag (e.g.
+     * master playlist variant URIs after {@link TagNames#EXTXSTREAMINF}).
      *
      * @param line playlist line item
      * @param lastTag last tag
      * @return unparsed tag
      */
     private UnparsedTag processLine(final String line, final UnparsedTag lastTag) {
+        final String trimmed = line.trim();
+        if (trimmed.isEmpty()) {
+            return lastTag;
+        }
 
-        if (line.matches(TAGPATTERN)) {
-            final UnparsedTag newUnparsedTag = new UnparsedTag(line);
+        if (trimmed.matches(TAGPATTERN)) {
+            final UnparsedTag newUnparsedTag = new UnparsedTag(trimmed);
             tags.add(newUnparsedTag);
 
             // Check if this tag specifies a variant stream. If so, this is
@@ -135,11 +157,18 @@ public class PlaylistParser {
                 this.isMasterPlaylist = true;
             }
 
+            final String tagName = newUnparsedTag.getTagName();
+            if (tagName.equals(TagNames.EXTINF) || tagName.equals(TagNames.EXTXBYTERANGE)) {
+                lastSegmentUriTag = newUnparsedTag;
+            }
+
             return newUnparsedTag;
-        } else if (line.matches(URIPATTERN) && (lastTag != null)) {
-            // If a line doesn't start with a # it is a URI associated with the
-            // last tag
-            lastTag.setURI(line);
+        } else if (trimmed.matches(URIPATTERN)) {
+            final UnparsedTag uriTag = lastSegmentUriTag != null ? lastSegmentUriTag : lastTag;
+            if (uriTag != null) {
+                uriTag.setURI(trimmed);
+                lastSegmentUriTag = null;
+            }
             return lastTag;
         }
 
