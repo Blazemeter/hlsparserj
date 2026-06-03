@@ -22,8 +22,6 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-import com.comcast.viper.hlsparserj.tags.media.ExtInf;
-
 public class MediaPlaylistPdtTest {
 
     @Test
@@ -35,6 +33,9 @@ public class MediaPlaylistPdtTest {
         assertEquals("segment_002.ts", playlist.getSegments().get(1).getURI());
         assertEquals("segment_003.ts", playlist.getSegments().get(2).getURI());
         assertEquals(17456, playlist.getMediaSequence().getSequenceNumber());
+        assertEquals("2026-06-02T16:33:11.352+0200", playlist.getSegments().get(0).getDateTime());
+        assertEquals("2026-06-02T16:33:15.352+0200", playlist.getSegments().get(1).getDateTime());
+        assertEquals("2026-06-02T16:33:19.352+0200", playlist.getSegments().get(2).getDateTime());
     }
 
     @Test
@@ -44,6 +45,8 @@ public class MediaPlaylistPdtTest {
         assertEquals(2, playlist.getSegments().size());
         assertEquals("segment_001.ts", playlist.getSegments().get(0).getURI());
         assertEquals("segment_002.ts", playlist.getSegments().get(1).getURI());
+        assertEquals("2026-06-02T16:33:11.352+0200", playlist.getSegments().get(0).getDateTime());
+        assertEquals("2026-06-02T16:33:15.352+0200", playlist.getSegments().get(1).getDateTime());
     }
 
     @Test
