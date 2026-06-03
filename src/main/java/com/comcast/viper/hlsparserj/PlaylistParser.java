@@ -88,12 +88,18 @@ public class PlaylistParser {
         return tags;
     }
 
+    private void resetParseState() {
+        tags.clear();
+        isMasterPlaylist = false;
+        lastSegmentUriTag = null;
+    }
+
     /**
      * Parse a given playlist string.
      * @param playlist playlist string
      */
     private void parseString(final String playlist) {
-        lastSegmentUriTag = null;
+        resetParseState();
         final StringTokenizer tokenizer = new StringTokenizer(playlist, "\n");
 
         String line;
@@ -109,7 +115,7 @@ public class PlaylistParser {
      * @throws IOException on reading the inputStream
      */
     private void parseInputStream() throws IOException {
-        lastSegmentUriTag = null;
+        resetParseState();
         final InputStreamReader isReader = new InputStreamReader(playlistStream);
         final BufferedReader bufReader = new BufferedReader(isReader);
 
