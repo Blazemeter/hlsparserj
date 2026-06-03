@@ -135,9 +135,13 @@ public class PlaylistParser {
      * @return unparsed tag
      */
     private UnparsedTag processLine(final String line, final UnparsedTag lastTag) {
+        final String trimmed = line.trim();
+        if (trimmed.isEmpty()) {
+            return lastTag;
+        }
 
-        if (line.matches(TAGPATTERN)) {
-            final UnparsedTag newUnparsedTag = new UnparsedTag(line);
+        if (trimmed.matches(TAGPATTERN)) {
+            final UnparsedTag newUnparsedTag = new UnparsedTag(trimmed);
             tags.add(newUnparsedTag);
 
             // Check if this tag specifies a variant stream. If so, this is
@@ -152,10 +156,10 @@ public class PlaylistParser {
             }
 
             return newUnparsedTag;
-        } else if (line.matches(URIPATTERN)) {
+        } else if (trimmed.matches(URIPATTERN)) {
             final UnparsedTag uriTag = lastSegmentUriTag != null ? lastSegmentUriTag : lastTag;
             if (uriTag != null) {
-                uriTag.setURI(line);
+                uriTag.setURI(trimmed);
                 lastSegmentUriTag = null;
             }
             return lastTag;
