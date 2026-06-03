@@ -41,6 +41,13 @@ public class PlaylistParser {
     private boolean isMasterPlaylist = false;
 
     /**
+     * Tag that should receive the next media segment URI line ({@link TagNames#EXTINF}
+     * or {@link TagNames#EXTXBYTERANGE}). Other tags (e.g. program date/time) may appear
+     * between that tag and the URI without claiming it.
+     */
+    private UnparsedTag lastSegmentUriTag;
+
+    /**
      * Constructor.
      */
     public PlaylistParser() {
@@ -86,6 +93,7 @@ public class PlaylistParser {
      * @param playlist playlist string
      */
     private void parseString(final String playlist) {
+        lastSegmentUriTag = null;
         final StringTokenizer tokenizer = new StringTokenizer(playlist, "\n");
 
         String line;
@@ -101,6 +109,7 @@ public class PlaylistParser {
      * @throws IOException on reading the inputStream
      */
     private void parseInputStream() throws IOException {
+        lastSegmentUriTag = null;
         final InputStreamReader isReader = new InputStreamReader(playlistStream);
         final BufferedReader bufReader = new BufferedReader(isReader);
 
@@ -117,7 +126,9 @@ public class PlaylistParser {
      * If the line is prefixed with a "#", it is handled as a new tag and
      * parsed/added to the list of tags.
      *
-     * If the line is a URI, it is set as the URI attribute of the last tag.
+     * If the line is a URI, it is set on the pending segment tag ({@link TagNames#EXTINF}
+     * or {@link TagNames#EXTXBYTERANGE}) when present; otherwise on the last tag (e.g.
+     * master playlist variant URIs after {@link TagNames#EXTXSTREAMINF}).
      *
      * @param line playlist line item
      * @param lastTag last tag
@@ -135,11 +146,18 @@ public class PlaylistParser {
                 this.isMasterPlaylist = true;
             }
 
+            final String tagName = newUnparsedTag.getTagName();
+            if (tagName.equals(TagNames.EXTINF) || tagName.equals(TagNames.EXTXBYTERANGE)) {
+                lastSegmentUriTag = newUnparsedTag;
+            }
+
             return newUnparsedTag;
-        } else if (line.matches(URIPATTERN) && (lastTag != null)) {
-            // If a line doesn't start with a # it is a URI associated with the
-            // last tag
-            lastTag.setURI(line);
+        } else if (line.matches(URIPATTERN)) {
+            final UnparsedTag uriTag = lastSegmentUriTag != null ? lastSegmentUriTag : lastTag;
+            if (uriTag != null) {
+                uriTag.setURI(line);
+                lastSegmentUriTag = null;
+            }
             return lastTag;
         }
 
