@@ -47,6 +47,26 @@ public class MediaPlaylistPdtTest {
     }
 
     @Test
+    public void segmentUrisWhenLinesHaveLeadingOrTrailingWhitespace() {
+        String playlist = "#EXTM3U\n"
+            + "#EXT-X-TARGETDURATION:4\n"
+            + "#EXT-X-MEDIA-SEQUENCE:0\n"
+            + " #EXTINF:4, \n"
+            + "  segment_001.ts  \n"
+            + "\n"
+            + "   \n"
+            + " #EXTINF:4,\n"
+            + "segment_002.ts\r\n";
+
+        MediaPlaylist parsed = (MediaPlaylist) PlaylistFactory.parsePlaylist(
+            PlaylistVersion.TWELVE, playlist);
+
+        assertEquals(2, parsed.getSegments().size());
+        assertEquals("segment_001.ts", parsed.getSegments().get(0).getURI());
+        assertEquals("segment_002.ts", parsed.getSegments().get(1).getURI());
+    }
+
+    @Test
     public void segmentUrisUnchangedForStandardPlaylist() throws Exception {
         MediaPlaylist playlist = parseResource("/mediaplaylist.m3u8");
 
